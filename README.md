@@ -4,8 +4,8 @@ This repository contains Terraform to add core services to an empty Kubernetes p
 
 This includes:
 - Common Namespaces in Kubernetes
-- DNS
-- Ingress Controller
+- DNS Zones
+- Ingress Controller ([AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller))
 
 ## READ THIS FIRST
 
