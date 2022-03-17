@@ -1,5 +1,9 @@
 # See https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/deploy/installation
 
+# NOTE:
+# The public subnets of the VPC need to have the tag 'kubernetes.io/role/elb=1' 
+# and 'kubernetes.io/cluster/vendorcorp-us-east-2-63pl3dng=shared'
+
 ################################################################################
 # IAM Policy allowing Nodes access to AWS to create load balancers
 ################################################################################
