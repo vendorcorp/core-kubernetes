@@ -4,6 +4,6 @@ resource "aws_route53_zone" "vendorcorp_internal" {
   tags    = var.default_resource_tags
 
   vpc {
-    vpc_id = module.shared_infrastructure.vpc_id
+    vpc_id = module.shared.vpc_id
   }
 }
