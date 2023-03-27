@@ -1,8 +1,10 @@
-# We purposefully use the Sonatype shared library here so we don't cyclically depend on the Vendor Corp EKS Cluster
-# existing!
+################################################################################
+# Load Vendor Corp Shared Infra
+################################################################################
 module "shared" {
-  source      = "git::ssh://git@github.com/sonatype/terraform-shared-infrastructure.git?ref=v0.1.0"
-  environment = var.environment
+  source                   = "git::ssh://git@github.com/vendorcorp/terraform-shared-infrastructure.git?ref=v0.4.0"
+  environment              = var.environment
+  default_eks_cluster_name = var.default_eks_cluster_name
 }
 
 data "aws_eks_cluster" "vendorcorp_eks_cluster" {
