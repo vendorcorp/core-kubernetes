@@ -1,17 +1,24 @@
 # See https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/deploy/installation
 
-# NOTE:
-# The public subnets of the VPC need to have the tag 'kubernetes.io/role/elb=1' 
-# and 'kubernetes.io/cluster/vendorcorp-us-east-2-63pl3dng=shared'
+################################################################################
+# IAM Policy allowing Nodes access to AWS EFS
+################################################################################
+module "aws_alb_irsa_role" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
 
-################################################################################
-# IAM Policy allowing Nodes access to AWS to create load balancers
-################################################################################
-resource "aws_iam_policy" "alb_policy" {
-  name        = "AWSLoadBalancerControllerIAMPolicy"
-  path        = "/"
-  description = "Policy that allows EKS Nodes to manage Load Balancers in AWS"
-  policy      = file("aws-load-balancer-iam-policy.json")
+  role_name = "vendorcorp-aws-alb-${var.aws_region}"
+
+  # Auto attach required IAM Policy
+  attach_load_balancer_controller_policy = true
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.shared.eks_cluster_oidc_provider_arn
+      namespace_service_accounts = ["kube-system:aws-load-balancer-controller"]
+    }
+  }
+
+  tags = var.default_resource_tags
 }
 
 ################################################################################
@@ -31,31 +38,41 @@ resource "helm_release" "aws_load_balancer_controller" {
   name       = "aws-load-balancer-controller"
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
-  version    = "1.4.1"
+  version    = "1.4.7"
   namespace  = "kube-system"
 
   set {
     name  = "clusterName"
     value = var.default_eks_cluster_name
   }
+
+  set {
+    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+    value = module.aws_alb_irsa_role.iam_role_arn
+  }
+
+  set {
+    name  = "serviceAccount.create"
+    value = true
+  }
+
+  set {
+    name  = "serviceAccount.name"
+    value = "aws-load-balancer-controller"
+  }
 }
 
 ################################################################################
-# Attach the IAM policy (above) to the Node Groups in our EKS Cluster
+# Create Token for Service Account (manual since k8s 1.24)
 ################################################################################
-data "aws_eks_node_groups" "all" {
-  cluster_name = var.default_eks_cluster_name
-}
+resource "kubernetes_secret" "aws_alb_sa_token" {
+  metadata {
+    annotations = {
+      "kubernetes.io/service-account.name" = "aws-load-balancer-controller"
+    }
+    name      = "aws-load-balancer-controller-sa-token"
+    namespace = "kube-system"
+  }
 
-data "aws_eks_node_group" "all" {
-  for_each = data.aws_eks_node_groups.all.names
-
-  cluster_name    = var.default_eks_cluster_name
-  node_group_name = each.value
-}
-
-resource "aws_iam_role_policy_attachment" "node_group_alb_attach" {
-  for_each   = data.aws_eks_node_group.all
-  role       = split("/", each.value.node_role_arn)[1]
-  policy_arn = aws_iam_policy.alb_policy.arn
+  type = "kubernetes.io/service-account-token"
 }
