@@ -6,13 +6,15 @@
 module "efs_csi_irsa_role" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
 
-  role_name             = "VendorCorp"
+  role_name = "vendorcorp-eks-efs-${var.aws_region}"
+
+  # Auto attach required EFS IAM Policy
   attach_efs_csi_policy = true
 
   oidc_providers = {
     main = {
       provider_arn               = module.shared.eks_cluster_oidc_provider_arn
-      namespace_service_accounts = ["kube-system:aws-node"]
+      namespace_service_accounts = ["kube-system:efs-csi-controller-sa"]
     }
   }
 
@@ -20,7 +22,7 @@ module "efs_csi_irsa_role" {
 }
 
 ################################################################################
-# Deploy aws-load-balancer-controller
+# Deploy aws-efs-csi-controller
 ################################################################################
 resource "helm_release" "aws_efs_csi_driver" {
   name       = "aws-efs-csi-driver"
@@ -35,9 +37,29 @@ resource "helm_release" "aws_efs_csi_driver" {
   }
 
   set {
+    name  = "controller.serviceAccount.name"
+    value = "efs-csi-controller-sa"
+  }
+
+  set {
     name  = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
     value = module.efs_csi_irsa_role.iam_role_arn
   }
+}
+
+################################################################################
+# Create Token for Service Account (manual since k8s 1.24)
+################################################################################
+resource "kubernetes_secret" "efs_csi_sa_token" {
+  metadata {
+    annotations = {
+      "kubernetes.io/service-account.name" = "efs-csi-controller-sa"
+    }
+    name      = "efs-csi-controller-sa-token"
+    namespace = "kube-system"
+  }
+
+  type = "kubernetes.io/service-account-token"
 }
 
 ################################################################################
@@ -62,7 +84,17 @@ resource "aws_efs_file_system" "vendorcorp_eks_efs" {
   performance_mode = "generalPurpose"
   throughput_mode  = "bursting"
 
-  tags = merge(tomap({ "Name" = "Vendor Corp EFS ${var.aws_region}" }), var.default_resource_tags)
+  tags = merge(tomap({ Name = "Vendor Corp EFS ${var.aws_region}" }), var.default_resource_tags)
+}
+
+################################################################################
+# Expose EFS Filesystem on our EKS Subnets
+################################################################################
+resource "aws_efs_mount_target" "efs_mount_targets" {
+  for_each        = module.shared.private_subnet_ids_az_map
+  file_system_id  = aws_efs_file_system.vendorcorp_eks_efs.id
+  security_groups = [module.shared.eks_cluster_security_group_id]
+  subnet_id       = each.value
 }
 
 ################################################################################
@@ -79,7 +111,7 @@ resource "kubernetes_storage_class" "storage_class_efs" {
     directoryPerms   = "700"
     fileSystemId     = aws_efs_file_system.vendorcorp_eks_efs.id
     gidRangeStart    = "1000"
-    gitRangeEnd      = "2000"
+    gidRangeEnd      = "2000"
     provisioningMode = "efs-ap"
   }
 }

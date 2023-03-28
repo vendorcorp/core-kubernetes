@@ -2,7 +2,7 @@
 # Load Vendor Corp Shared Infra
 ################################################################################
 module "shared" {
-  source                   = "git::ssh://git@github.com/vendorcorp/terraform-shared-infrastructure.git?ref=v0.4.0"
+  source                   = "git::ssh://git@github.com/vendorcorp/terraform-shared-infrastructure.git?ref=v0.5.0"
   environment              = var.environment
   default_eks_cluster_name = var.default_eks_cluster_name
 }
