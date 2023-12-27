@@ -31,10 +31,30 @@ resource "helm_release" "aws_efs_csi_driver" {
   version    = "2.5.2"
   namespace  = "kube-system"
 
-  # set {
-  #   name  = "image.repository"
-  #   value = "602401143452.dkr.ecr.${var.aws_region}.amazonaws.com/eks/aws-efs-csi-driver"
-  # }
+  set {
+    name = "nodeSelector.instancegroup"
+    value = "vendorcorp-core"
+  }
+
+  set {
+    name = "tolerations[0].key"
+    value = "dedicated"
+  }
+
+  set {
+    name = "tolerations[0].value"
+    value = "vendorcorp-core"
+  }
+
+  set {
+    name = "tolerations[0].operator"
+    value = "Equal"
+  }
+
+  set {
+    name = "tolerations[0].effect"
+    value = "NoSchedule"
+  }
 
   set {
     name  = "controller.serviceAccount.name"
