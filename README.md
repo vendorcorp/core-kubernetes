@@ -3,9 +3,10 @@
 This repository contains Terraform to add core services to an empty Kubernetes platform.
 
 This includes:
-- Common Namespaces in Kubernetes
 - DNS Zones
 - Ingress Controller ([AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller))
+- Storage Providers:
+  - AWS EFS
 
 ## READ THIS FIRST
 
@@ -17,7 +18,7 @@ The rest of this documentation assumes you have created an AWS Vault profile cal
 
 ## Technologies Used
 
-- [Terraform](https://www.terraform.io/downloads.html) v1.0.11: What you'll find in this repository!
+- [Terraform](https://www.terraform.io/downloads.html) v1.4.5: What you'll find in this repository!
 - AWS Vault: You need this to access Sonatype AWS Accounts
 
 ## Running Terraform
