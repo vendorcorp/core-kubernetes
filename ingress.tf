@@ -45,6 +45,31 @@ resource "helm_release" "aws_load_balancer_controller" {
   namespace  = "kube-system"
 
   set {
+    name = "nodeSelector.instancegroup"
+    value = "vendorcorp-core"
+  }
+
+  set {
+    name = "tolerations[0].key"
+    value = "dedicated"
+  }
+
+  set {
+    name = "tolerations[0].value"
+    value = "vendorcorp-core"
+  }
+
+  set {
+    name = "tolerations[0].operator"
+    value = "Equal"
+  }
+
+  set {
+    name = "tolerations[0].effect"
+    value = "NoSchedule"
+  }
+
+  set {
     name  = "clusterName"
     value = var.default_eks_cluster_name
   }
