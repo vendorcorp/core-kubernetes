@@ -32,27 +32,27 @@ resource "helm_release" "aws_efs_csi_driver" {
   namespace  = "kube-system"
 
   set {
-    name = "nodeSelector.instancegroup"
+    name = "controller.nodeSelector.instancegroup"
     value = "vendorcorp-core"
   }
 
   set {
-    name = "tolerations[0].key"
+    name = "controller.tolerations[0].key"
     value = "dedicated"
   }
 
   set {
-    name = "tolerations[0].value"
+    name = "controller.tolerations[0].value"
     value = "vendorcorp-core"
   }
 
   set {
-    name = "tolerations[0].operator"
+    name = "controller.tolerations[0].operator"
     value = "Equal"
   }
 
   set {
-    name = "tolerations[0].effect"
+    name = "controller.tolerations[0].effect"
     value = "NoSchedule"
   }
 
