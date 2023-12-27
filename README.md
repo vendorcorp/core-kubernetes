@@ -5,6 +5,7 @@ This repository contains Terraform to add core services to an empty Kubernetes p
 This includes:
 - DNS Zones
 - Ingress Controller ([AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller))
+  - [`external-dns`](https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.6/guide/integrations/external_dns/) to manage Route 53 DNS entries for Ingress
 - `metrics-server`
 - Storage Providers:
   - AWS EFS
