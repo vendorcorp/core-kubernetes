@@ -11,4 +11,29 @@ resource "helm_release" "metrics_server" {
   chart      = "metrics-server"
   version    = "3.11.0"
   namespace  = "kube-system"
+
+  set {
+    name = "nodeSelector.instancegroup"
+    value = "vendorcorp-core"
+  }
+
+  set {
+    name = "tolerations[0].key"
+    value = "dedicated"
+  }
+
+  set {
+    name = "tolerations[0].value"
+    value = "vendorcorp-core"
+  }
+
+  set {
+    name = "tolerations[0].operator"
+    value = "Equal"
+  }
+
+  set {
+    name = "tolerations[0].effect"
+    value = "NoSchedule"
+  }
 }
