@@ -7,6 +7,7 @@ This includes:
 - Ingress Controller ([AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller))
   - [`external-dns`](https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.6/guide/integrations/external_dns/) to manage Route 53 DNS entries for Ingress
 - `metrics-server`
+- [Prometheus](https://prometheus.io/) for monitoring of services
 - Storage Providers:
   - AWS EFS
 

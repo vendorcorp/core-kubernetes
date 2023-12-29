@@ -1,0 +1,18 @@
+server:
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: alb
+      alb.ingress.kubernetes.io/group.name: vendorcorp-core
+      alb.ingress.kubernetes.io/scheme: internal
+      external-dns.alpha.kubernetes.io/hostname: monitoring.corp.vendorcorp.net
+    hosts:
+     - monitoring.corp.vendorcorp.net
+  persistentVolume:
+    storageClass: efs-fs
+  service:
+    type: NodePort
+
+alertmanager:
+  persistence:
+    storageClass: efs-fs
