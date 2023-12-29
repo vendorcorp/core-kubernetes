@@ -65,6 +65,11 @@ resource "helm_release" "aws_efs_csi_driver" {
     name  = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
     value = module.efs_csi_irsa_role.iam_role_arn
   }
+
+  set {
+    name = "node.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+    value = module.efs_csi_irsa_role.iam_role_arn
+  }
 }
 
 # ################################################################################
@@ -123,6 +128,9 @@ resource "aws_efs_mount_target" "efs_mount_targets" {
 resource "kubernetes_storage_class" "storage_class_efs" {
   metadata {
     name = "efs-fs"
+    annotations = {
+      "storageclass.kubernetes.io/is-default-class" = "true"
+    }
   }
   storage_provisioner = "efs.csi.aws.com"
   mount_options       = ["tls"]
