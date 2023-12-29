@@ -28,3 +28,16 @@ variable "default_eks_cluster_name" {
   type        = string
   default     = "vendorcorp-oCBeuuDXqV"
 }
+
+variable "pg_admin_username" {
+  description = "Administrator/Root user to access your PostgreSQL service."
+  type        = string
+  default     = "root"
+}
+
+variable "pg_admin_password" {
+  description = "Administrator/Root password to access your PostgreSQL service."
+  type        = string
+  default     = null
+  sensitive   = true
+}

@@ -1,0 +1,36 @@
+service:
+  type: NodePort
+
+ingress:
+  enabled: true
+  name: gatus
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/group.name: vendorcorp-core
+    alb.ingress.kubernetes.io/scheme: internal
+    external-dns.alpha.kubernetes.io/hostname: status.corp.vendorcorp.net
+  hosts:
+    - status.corp.vendorcorp.net
+
+persistence:
+  enabled: true
+
+config:
+  metrics: true
+  storage:
+    type: postgres
+  endpoints:
+    - name: "KeyCloak"
+      url: "https://keycloak.corp.vendorcorp.net/health/live"
+      internal: 1m
+      conditions:
+        - "[STATUS] == 200"         # Status must be 200
+        - "[BODY].status == UP"     # The json path "$.status" must be equal to UP
+        - "[RESPONSE_TIME] < 300"   # Response time must be under 300ms
+  ui:
+    description: "Vendor Corp Service Status"
+    header: "Vendor Corp Status"
+    title: "Vendor Corp Service Status"
+    buttons:
+      - name: "Prometheus"
+        link: "https://monitoring.corp.vendorcorp.net"
