@@ -69,8 +69,13 @@ resource "helm_release" "gatus" {
   ]
 
   set {
+    name = "env.PGSQL_HOST"
+    value = module.shared.pgsql_cluster_endpoint_write
+  }
+
+  set {
     name = "config.storage.path"
-    value = "postgres://gatus:gatus@${module.shared.pgsql_cluster_endpoint_write}/gatus"
+    value = "postgres://gatus:gatus@$${PGSQL_HOST}/gatus"
   }
 
   set {
