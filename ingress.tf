@@ -88,19 +88,10 @@ resource "helm_release" "aws_load_balancer_controller" {
     name  = "serviceAccount.name"
     value = "aws-load-balancer-controller"
   }
+
+  # See https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies
+  set {
+    name  = "defaultSSLPolicy"
+    value = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  }
 }
-
-################################################################################
-# Create Token for Service Account (manual since k8s 1.24)
-################################################################################
-# resource "kubernetes_secret" "aws_alb_sa_token" {
-#   metadata {
-#     annotations = {
-#       "kubernetes.io/service-account.name" = "aws-load-balancer-controller"
-#     }
-#     name      = "aws-load-balancer-controller-sa-token"
-#     namespace = "kube-system"
-#   }
-
-#   type = "kubernetes.io/service-account-token"
-# }
