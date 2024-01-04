@@ -26,7 +26,8 @@ module "aws_r53_irsa_role" {
 
   external_dns_hosted_zone_arns = [
     module.shared.dns_zone_public_arn,
-    module.shared.dns_zone_internal_arn
+    module.shared.dns_zone_internal_arn,
+    module.shared_private.dns_zone_bma_arn
   ]
 
   oidc_providers = {
@@ -51,7 +52,11 @@ resource "helm_release" "external-dns" {
 
   set_list {
     name = "domainFilters"
-    value = ["${module.shared.dns_zone_public_name}", "${module.shared.dns_zone_internal_name}"]
+    value = [
+      "${module.shared.dns_zone_public_name}", 
+      "${module.shared.dns_zone_internal_name}",
+      "us.${module.shared_private.dns_zone_bma_name}"
+    ]
   }
 
   set {

@@ -7,6 +7,14 @@ module "shared" {
   default_eks_cluster_name = var.default_eks_cluster_name
 }
 
+################################################################################
+# Load Vendor Corp Private Shared Infra
+################################################################################
+module "shared_private" {
+  source                   = "git::ssh://git@github.com/vendorcorp/terraform-shared-private-infrastructure.git?ref=v0.1.0"
+  environment              = var.environment
+}
+
 data "aws_eks_cluster" "vendorcorp_eks_cluster" {
   name = var.default_eks_cluster_name
 }
