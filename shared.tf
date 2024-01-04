@@ -11,7 +11,7 @@ module "shared" {
 # Load Vendor Corp Private Shared Infra
 ################################################################################
 module "shared_private" {
-  source                   = "git::ssh://git@github.com/vendorcorp/terraform-shared-private-infrastructure.git?ref=v0.1.0"
+  source                   = "git::ssh://git@github.com/vendorcorp/terraform-shared-private-infrastructure.git?ref=v0.2.0"
   environment              = var.environment
 }
 

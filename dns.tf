@@ -27,7 +27,7 @@ module "aws_r53_irsa_role" {
   external_dns_hosted_zone_arns = [
     module.shared.dns_zone_public_arn,
     module.shared.dns_zone_internal_arn,
-    module.shared_private.dns_zone_bma_arn
+    module.shared_private.dns_zone_bma_us_arn
   ]
 
   oidc_providers = {
@@ -55,9 +55,15 @@ resource "helm_release" "external-dns" {
     value = [
       "${module.shared.dns_zone_public_name}", 
       "${module.shared.dns_zone_internal_name}",
-      "${module.shared_private.dns_zone_bma_name}"
+      "${module.shared_private.dns_zone_bma_us_name}"
     ]
   }
+
+  # Full syncronisation of DNS entries?
+  # set {
+  #   name = "policy"
+  #   value = "sync"
+  # }
 
   set {
     name = "nodeSelector.instancegroup"
