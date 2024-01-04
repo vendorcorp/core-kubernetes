@@ -55,7 +55,7 @@ resource "helm_release" "external-dns" {
     value = [
       "${module.shared.dns_zone_public_name}", 
       "${module.shared.dns_zone_internal_name}",
-      "us.${module.shared_private.dns_zone_bma_name}"
+      "${module.shared_private.dns_zone_bma_name}"
     ]
   }
 
