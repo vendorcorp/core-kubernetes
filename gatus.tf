@@ -53,6 +53,39 @@ resource "kubernetes_namespace" "gatus" {
 }
 
 ################################################################################
+# Create ClusterRole & ClusterRoleBinding
+#
+# Required for the sidecar to be able to list ConfigMaps from all Namespaces
+################################################################################
+resource "kubernetes_cluster_role" "gatus" {
+  metadata {
+    name = "gatus"
+  }
+
+  rule {
+    api_groups = [""]
+    resources  = ["configmaps", "secrets"]
+    verbs      = ["get", "list", "watch"]
+  }
+}
+
+resource "kubernetes_cluster_role_binding" "gatus" {
+  metadata {
+    name = "gatus"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "gatus"
+  }
+  subject {
+    kind      = "ServiceAccount"
+    name      = "gatus"
+    namespace = kubernetes_namespace.gatus.metadata[0].name
+  }
+}
+
+################################################################################
 # Deploy gatus
 #
 # Seehttps://github.com/minicloudlabs/helm-charts/tree/main/charts/gatus#configuration
@@ -67,6 +100,11 @@ resource "helm_release" "gatus" {
   values = [
     "${file("values/gatus.yaml")}"
   ]
+
+  set {
+    name = "env.GATUS_CONFIG_PATH"
+    value = "/shared-config/"
+  }
 
   set {
     name = "env.PGSQL_HOST"
