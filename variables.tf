@@ -41,3 +41,17 @@ variable "pg_admin_password" {
   default     = null
   sensitive   = true
 }
+
+variable "ghrc_io_username" {
+  description = "Username for ghrc.io OCI registry"
+  type        = string
+  default     = null
+  sensitive   = true
+}
+
+variable "ghrc_io_password" {
+  description = "Username for ghrc.io OCI registry"
+  type        = string
+  default     = null
+  sensitive   = true
+}

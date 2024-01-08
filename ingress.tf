@@ -25,16 +25,6 @@ module "aws_alb_irsa_role" {
 }
 
 ################################################################################
-# Helm Provider
-################################################################################
-provider "helm" {
-  kubernetes {
-    config_path    = "~/.kube/config"
-    config_context = data.aws_eks_cluster.vendorcorp_eks_cluster.arn
-  }
-}
-
-################################################################################
 # Deploy aws-load-balancer-controller
 ################################################################################
 resource "helm_release" "aws_load_balancer_controller" {

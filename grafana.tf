@@ -1,34 +1,29 @@
-# See https://prometheus.io/docs/prometheus/latest/installation/
+# See https://grafana.github.io/grafana-operator/docs/installation/helm/
 
 ################################################################################
 # Create Namespace
 ################################################################################
-resource "kubernetes_namespace" "prometheus" {
+resource "kubernetes_namespace" "grafana" {
   metadata {
-    name = "prometheus"
+    name = "grafana"
   }
 }
 
 ################################################################################
-# Deploy metrics-server
+# Deploy grafana using Helm
 #
-# See https://artifacthub.io/packages/helm/metrics-server/metrics-server
+# See https://grafana.github.io/grafana-operator/docs/installation/helm/
 ################################################################################
-resource "helm_release" "prometheus" {
-  name       = "prometheus"
-  repository = "https://prometheus-community.github.io/helm-charts"
-  chart      = "prometheus"
-  version    = "25.8.2"
-  namespace  = "prometheus"
+resource "helm_release" "grafana" {
+  name       = "grafana"
+  repository = "oci://ghcr.io/grafana/helm-charts/grafana-operator"
+  chart      = "grafana-operator"
+  version    = "v5.6.0"
+  namespace  = kubernetes_namespace.grafana.metadata[0].name
 
-  values = [
-    "${file("values/prometheus.yaml")}"
-  ]
-
-  set {
-    name = "server.ingress.annotations.alb\\.ingress\\.kubernetes\\.io/certificate-arn"
-    value = module.shared.vendorcorp_net_cert_arn
-  }
+#   values = [
+#     "${file("values/grafana.yaml")}"
+#   ]
 
   set {
     name = "nodeSelector.instancegroup"
