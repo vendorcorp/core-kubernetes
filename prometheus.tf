@@ -31,6 +31,16 @@ resource "helm_release" "prometheus" {
   }
 
   set {
+    name = "server.ingress.external-dns\\.alpha\\.kubernetes\\.io/hostname"
+    value = "monitoring.${module.shared_private.dns_zone_vendorcorp_name}"
+  }
+
+  set_list {
+    name = "server.ingress.hosts"
+    value = ["monitoring.${module.shared_private.dns_zone_vendorcorp_name}"]
+  }
+
+  set {
     name = "nodeSelector.instancegroup"
     value = "vendorcorp-core"
   }

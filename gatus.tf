@@ -122,6 +122,16 @@ resource "helm_release" "gatus" {
   }
 
   set {
+    name = "ingress.annotations.external-dns\\.alpha\\.kubernetes\\.io/hostname"
+    value = "status.${module.shared_private.dns_zone_vendorcorp_name}"
+  }
+
+  set_list {
+    name = "ingress.hosts"
+    value = ["status.${module.shared_private.dns_zone_vendorcorp_name}"]
+  }
+
+  set {
     name = "nodeSelector.instancegroup"
     value = "vendorcorp-core"
   }
