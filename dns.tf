@@ -1,15 +1,15 @@
 ################################################################################
 # Create internal DNS Zone for Vendor Corp
 ################################################################################
-resource "aws_route53_zone" "vendorcorp_internal" {
-  name    = "vendorcorp.internal"
-  comment = "Vendor Corp internal DNS Zone"
-  tags    = var.default_resource_tags
+# resource "aws_route53_zone" "vendorcorp_internal" {
+#   name    = "vendorcorp.internal"
+#   comment = "Vendor Corp internal DNS Zone"
+#   tags    = var.default_resource_tags
 
-  vpc {
-    vpc_id = module.shared.vpc_id
-  }
-}
+#   vpc {
+#     vpc_id = module.shared.vpc_id
+#   }
+# }
 
 ################################################################################
 # IAM Policy allowing Nodes access to AWS Route 53
@@ -20,14 +20,13 @@ resource "aws_route53_zone" "vendorcorp_internal" {
 module "aws_r53_irsa_role" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
 
-  role_name = "${module.shared.eks_cluster_id}-aws-r53-${var.aws_region}"
+  role_name = "${module.shared.eks_cluster_id}-aws-r53-${module.shared_private.region}"
 
   attach_external_dns_policy = true
 
   external_dns_hosted_zone_arns = [
-    module.shared.dns_zone_public_arn,
-    module.shared.dns_zone_internal_arn,
-    module.shared_private.dns_zone_bma_us_arn
+    module.shared_private.dns_zone_bma_arn,
+    module.shared_private.dns_zone_vendorcorp_arn
   ]
 
   oidc_providers = {
@@ -53,17 +52,16 @@ resource "helm_release" "external-dns" {
   set_list {
     name = "domainFilters"
     value = [
-      "${module.shared.dns_zone_public_name}", 
-      "${module.shared.dns_zone_internal_name}",
-      "${module.shared_private.dns_zone_bma_us_name}"
-    ]
+      "${module.shared_private.dns_zone_bma_name}", 
+      "${module.shared_private.dns_zone_vendorcorp_name}"
+    ]:
   }
 
-  # Full syncronisation of DNS entries?
-  # set {
-  #   name = "policy"
-  #   value = "sync"
-  # }
+  # Full syncronisation of DNS entries
+  set {
+    name = "policy"
+    value = "sync"
+  }
 
   set {
     name = "nodeSelector.instancegroup"

@@ -6,7 +6,7 @@
 module "efs_csi_irsa_role" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
 
-  role_name = "${module.shared.eks_cluster_id}-efs-${var.aws_region}"
+  role_name = "${module.shared.eks_cluster_id}-efs-${module.shared_private.region}"
 
   # Auto attach required EFS IAM Policy
   attach_efs_csi_policy = true
@@ -73,21 +73,6 @@ resource "helm_release" "aws_efs_csi_driver" {
 }
 
 # ################################################################################
-# # Create Token for Service Account (manual since k8s 1.24)
-# ################################################################################
-# resource "kubernetes_secret" "efs_csi_sa_token" {
-#   metadata {
-#     annotations = {
-#       "kubernetes.io/service-account.name" = "efs-csi-controller-sa"
-#     }
-#     name      = "efs-csi-controller-sa-token"
-#     namespace = "kube-system"
-#   }
-
-#   type = "kubernetes.io/service-account-token"
-# }
-
-# ################################################################################
 # # KMS Key for EFS encryption
 # ################################################################################
 resource "aws_kms_key" "efs_kms_key" {
@@ -118,10 +103,10 @@ resource "aws_efs_file_system" "vendorcorp_eks_efs" {
 resource "aws_security_group" "eks_node_efs_mount_access" {
   name        = "${module.shared.eks_cluster_id}-efs-mount-sg"
   description = "Allow nodes in ${module.shared.eks_cluster_id} Cluster to mount EFS via NFS"
-  vpc_id      = module.shared.vpc_id
+  vpc_id      = module.shared_private.vpc_id
   
   ingress {
-    cidr_blocks = module.shared.private_subnet_cidrs
+    cidr_blocks = module.shared_private.private_subnet_cidrs
     from_port   = 2049
     to_port     = 2049
     protocol    = "tcp"
@@ -132,7 +117,7 @@ resource "aws_security_group" "eks_node_efs_mount_access" {
 # Expose EFS Filesystem on our EKS Subnets
 # ################################################################################
 resource "aws_efs_mount_target" "efs_mount_targets" {
-  for_each        = module.shared.private_subnet_ids_az_map
+  for_each        = module.shared_private.private_subnet_ids_az_map
   file_system_id  = aws_efs_file_system.vendorcorp_eks_efs.id
   security_groups = [aws_security_group.eks_node_efs_mount_access.id]
   subnet_id       = each.value

@@ -9,7 +9,7 @@
 module "aws_alb_irsa_role" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
 
-  role_name = "${module.shared.eks_cluster_id}-aws-alb-${var.aws_region}"
+  role_name = "${module.shared.eks_cluster_id}-aws-alb-${module.shared_private.region}"
 
   # Auto attach required IAM Policy
   attach_load_balancer_controller_policy = true
@@ -30,7 +30,7 @@ module "aws_alb_irsa_role" {
 provider "helm" {
   kubernetes {
     config_path    = "~/.kube/config"
-    config_context = data.aws_eks_cluster.vendorcorp_eks_cluster.arn
+    config_context = module.shared.eks_cluster_arn
   }
 }
 
@@ -71,7 +71,7 @@ resource "helm_release" "aws_load_balancer_controller" {
 
   set {
     name  = "clusterName"
-    value = var.default_eks_cluster_name
+    value = module.shared.eks_cluster_id
   }
 
   set {

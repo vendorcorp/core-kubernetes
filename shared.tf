@@ -1,25 +1,16 @@
 ################################################################################
-# Load Vendor Corp Shared Infra
-################################################################################
-module "shared" {
-  source                   = "git::ssh://git@github.com/vendorcorp/terraform-shared-infrastructure.git?ref=v0.6.1"
-  environment              = var.environment
-  default_eks_cluster_name = var.default_eks_cluster_name
-}
-
-################################################################################
 # Load Vendor Corp Private Shared Infra
 ################################################################################
-module "shared_private" {
-  source                   = "git::ssh://git@github.com/vendorcorp/terraform-shared-private-infrastructure.git?ref=v0.2.0"
-  environment              = var.environment
+module "shared" {
+  source                   = "git::ssh://git@github.com/vendorcorp/terraform-shared-infrastructure.git?ref=v1.0.0"
 }
 
-data "aws_eks_cluster" "vendorcorp_eks_cluster" {
-  name = var.default_eks_cluster_name
+module "shared_private" {
+  source                   = "git::ssh://git@github.com/vendorcorp/terraform-shared-private-infrastructure.git?ref=v1.4.2"
+  environment              = var.environment
 }
 
 provider "kubernetes" {
   config_path    = "~/.kube/config"
-  config_context = data.aws_eks_cluster.vendorcorp_eks_cluster.arn
+  config_context = module.shared.eks_cluster_arn
 }

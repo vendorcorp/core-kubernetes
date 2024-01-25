@@ -34,7 +34,7 @@ resource "postgresql_role" "gatus" {
   password = "gatus"
 }
 
-resource "postgresql_database" "keycloak" {
+resource "postgresql_database" "gatus" {
   name              = "gatus"
   owner             = "gatus"
   template          = "template0"
@@ -118,7 +118,7 @@ resource "helm_release" "gatus" {
 
   set {
     name = "ingress.annotations.alb\\.ingress\\.kubernetes\\.io/certificate-arn"
-    value = module.shared.vendorcorp_net_cert_arn
+    value = module.shared_private.vendorcorp_cert_arn
   }
 
   set {

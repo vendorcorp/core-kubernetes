@@ -5,9 +5,9 @@ server:
       kubernetes.io/ingress.class: alb
       alb.ingress.kubernetes.io/group.name: vendorcorp-core
       alb.ingress.kubernetes.io/scheme: internal
-      external-dns.alpha.kubernetes.io/hostname: monitoring.corp.vendorcorp.net
+      external-dns.alpha.kubernetes.io/hostname: monitoring.eu1.corp.vendorcorp.net
     hosts:
-     - monitoring.corp.vendorcorp.net
+     - monitoring.eu1.corp.vendorcorp.net
   persistentVolume:
     storageClass: efs-fs
   service:

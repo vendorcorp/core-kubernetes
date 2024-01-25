@@ -27,7 +27,7 @@ resource "helm_release" "prometheus" {
 
   set {
     name = "server.ingress.annotations.alb\\.ingress\\.kubernetes\\.io/certificate-arn"
-    value = module.shared.vendorcorp_net_cert_arn
+    value = module.shared_private.vendorcorp_cert_arn
   }
 
   set {
