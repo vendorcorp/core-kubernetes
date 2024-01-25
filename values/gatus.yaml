@@ -8,9 +8,6 @@ ingress:
     kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/group.name: vendorcorp-core
     alb.ingress.kubernetes.io/scheme: internal
-    external-dns.alpha.kubernetes.io/hostname: status.eu1.corp.vendorcorp.net
-  hosts:
-    - status.eu1.corp.vendorcorp.net
 
 # persistence:
 #   enabled: true
