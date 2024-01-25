@@ -54,7 +54,7 @@ resource "helm_release" "external-dns" {
     value = [
       "${module.shared_private.dns_zone_bma_name}", 
       "${module.shared_private.dns_zone_vendorcorp_name}"
-    ]:
+    ]
   }
 
   # Full syncronisation of DNS entries
