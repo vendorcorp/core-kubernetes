@@ -18,8 +18,8 @@ provider "postgresql" {
   host            = module.shared.pgsql_cluster_endpoint_write
   port            = module.shared.pgsql_cluster_port
   database        = "postgres"
-  username        = var.pg_admin_username
-  password        = var.pg_admin_password
+  username        = module.shared.pgsql_cluster_master_username
+  password        = module.shared.pgsql_cluster_master_password
   sslmode         = "require"
   connect_timeout = 15
   superuser       = false

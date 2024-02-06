@@ -3,7 +3,7 @@
 ################################################################################
 # Create Namespace
 ################################################################################
-resource "kubernetes_namespace" "keycprometheusloak" {
+resource "kubernetes_namespace" "prometheus" {
   metadata {
     name = "prometheus"
   }
@@ -19,7 +19,7 @@ resource "helm_release" "prometheus" {
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "prometheus"
   version    = "25.8.2"
-  namespace  = "prometheus"
+  namespace  = kubernetes_namespace.prometheus.metadata[0].name
 
   values = [
     "${file("values/prometheus.yaml")}"

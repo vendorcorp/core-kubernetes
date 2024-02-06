@@ -16,16 +16,3 @@ variable "environment" {
   type        = string
   default     = "production"
 }
-
-variable "pg_admin_username" {
-  description = "Administrator/Root user to access your PostgreSQL service."
-  type        = string
-  default     = "root"
-}
-
-variable "pg_admin_password" {
-  description = "Administrator/Root password to access your PostgreSQL service."
-  type        = string
-  default     = null
-  sensitive   = true
-}
